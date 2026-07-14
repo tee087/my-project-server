@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-white text-gray-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-brand-blue {
+    color: #0045a0;
+  }
+  .bg-brand-blue {
+    background-color: #0045a0;
+  }
+  .border-brand-blue {
+    border-color: #0045a0;
+  }
+  .from-brand-blue {
+    --tw-gradient-from: #0045a0;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 69, 160, 0));
+  }
+  .to-brand-blue {
+    --tw-gradient-to: #0045a0;
+  }
+  .via-brand-blue {
+    --tw-gradient-via: #0045a0;
+  }
+  .text-2xs {
+    font-size: 0.65rem;
+    line-height: 1rem;
+  }
+
+  /* Binance Dark Theme Tokens */
+  .bg-binance-dark { background-color: #0B0E11; }
+  .bg-binance-card { background-color: #181A20; }
+  .bg-binance-elevated { background-color: #1E2026; }
+  .bg-binance-hover { background-color: #2B2F36; }
+  .text-binance-primary { color: #EAECEF; }
+  .text-binance-secondary { color: #B7BDC6; }
+  .text-binance-muted { color: #848E9C; }
+  .text-binance-yellow { color: #F0B90B; }
+  .bg-binance-yellow { background-color: #F0B90B; }
+  .text-binance-green { color: #0ECB81; }
+  .bg-binance-green { background-color: #0ECB81; }
+  .text-binance-red { color: #F6465D; }
+  .bg-binance-red { background-color: #F6465D; }
+  .border-binance { border-color: #2B2F36; }
+
+  /* Glow animations for tab buttons */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(0, 69, 160, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 12px 4px rgba(0, 69, 160, 0.6);
+    }
+  }
+  .glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  @keyframes fade-in-out {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .animate-fade-in-out {
+    animation: fade-in-out 2s ease-in-out infinite;
+  }
+}
+
+.tradingview-widget-container {
+  background: #0B0E11;
+}
+
+.tradingview-widget-container__widget {
+  height: 100%;
+  border-radius: 0;
+}
