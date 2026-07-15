@@ -9,8 +9,8 @@ import fs from 'fs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Create uploads directory if it doesn't exist (for local development)
-const kycUploadDir = process.env.VERCEL ? '/tmp/uploads/kyc' : path.join(__dirname, '../../public/uploads/kyc')
-const avatarUploadDir = process.env.VERCEL ? '/tmp/uploads/avatars' : path.join(__dirname, '../../public/uploads/avatars')
+const kycUploadDir = process.env.VERCEL || process.env.RENDER ? '/tmp/uploads/kyc' : path.join(__dirname, '../../public/uploads/kyc')
+const avatarUploadDir = process.env.VERCEL || process.env.RENDER ? '/tmp/uploads/avatars' : path.join(__dirname, '../../public/uploads/avatars')
 
 try {
   fs.mkdirSync(kycUploadDir, { recursive: true })

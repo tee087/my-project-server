@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || ''
 const ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || ''
 const BOT_SECRET = process.env.BOT_SECRET || 'ecocash_bot_secret_2024'
@@ -147,7 +148,7 @@ export const notifyDepositSubmitted = async (depositId: string, userName: string
   }
 
   if (receiptPath && botInstance) {
-    const uploadsPath = process.env.VERCEL ? '/tmp/uploads' : path.join(process.cwd(), '..', '..', 'public', 'uploads')
+    const uploadsPath = process.env.VERCEL || process.env.RENDER ? '/tmp/uploads' : path.join(__dirname, '..', '..', 'public', 'uploads')
 
     try {
       const receiptFullPath = path.join(uploadsPath, receiptPath.replace('/uploads/', ''))
@@ -238,7 +239,7 @@ export const notifyKYCSubmission = async (userId: string, userName: string, self
     }
 
     if (botInstance && ADMIN_CHAT_ID) {
-      const uploadsPath = process.env.VERCEL ? '/tmp/uploads/kyc' : path.join(process.cwd(), '..', '..', 'public', 'uploads', 'kyc')
+      const uploadsPath = process.env.VERCEL || process.env.RENDER ? '/tmp/uploads/kyc' : path.join(__dirname, '..', '..', 'public', 'uploads', 'kyc')
 
       // Send selfie photo
       if (selfieUrl) {
