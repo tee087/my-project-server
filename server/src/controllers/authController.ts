@@ -39,7 +39,7 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
 
     const referralCode = suppliedReferralCode?.toUpperCase()
     const referrer = referralCode
-      ? await prisma.user.findFirst({ where: { referralCode: { equals: referralCode, mode: 'insensitive' } } })
+      ? await prisma.user.findFirst({ where: { OR: [{ referralCode: referralCode }, { referralCode: { equals: suppliedReferralCode, mode: 'insensitive' } }] } })
       : null
 
     if (referralCode && !referrer) {
