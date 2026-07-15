@@ -44,7 +44,7 @@ model User {
   notifications      Notification[]
   telegramChatId      String?
   walletBalance       Float     @default(0)
-  referralCode        String?   @unique
+  referralCode        String?    @unique
   referredById        String?
   referralBalance     Float     @default(0)
   referralCycleCount  Int       @default(0)
