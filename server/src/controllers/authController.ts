@@ -39,12 +39,12 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
 
     const referralCode = suppliedReferralCode?.toUpperCase()
     const referrer = referralCode
-      ? await prisma.user.findUnique({ where: { referralCode } })
+      ? await prisma.user.findFirst({ where: { referralCode: { equals: referralCode, mode: 'insensitive' } } })
       : null
 
     if (referralCode && !referrer) {
-      res.status(400).json({ success: false, message: 'This referral link is invalid or has expired.' })
-      return
+      console.log('Referral code provided but referrer not found:', referralCode)
+      // Continue without referrer - the code may have expired or been deleted
     }
 
     const createUser = async (attempt = 0): Promise<any> => {
