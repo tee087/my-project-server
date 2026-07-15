@@ -64,34 +64,11 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
               isActive: false,
               kycStatus: 'PENDING',
             },
-          })
-
-          if (referrer) {
-            // Each cycle accepts 20 registrations, each worth $5 to the referrer.
-            const incremented = await tx.user.updateMany({
-              where: { id: referrer.id, referralCycleCount: { lt: 20 } },
-              data: { referralCycleCount: { increment: 1 }, referralBalance: { increment: 5 } },
-            })
-            if (incremented.count) {
-              const updatedReferrer = await tx.user.findUnique({
-                where: { id: referrer.id },
-                select: { referralCycleCount: true },
-              })
-              if (updatedReferrer?.referralCycleCount === 20) {
-                await tx.referralBonus.create({
-                  data: { referrerId: referrer.id, beneficiaryId: referrer.id, eligibleAt: new Date() },
-                })
-              }
-            }
-          }
-
-          return createdUser
-        })
-      } catch (error: any) {
-        // An extremely unlikely referral-code collision is safe to retry.
-        if (error?.code === 'P2002' && attempt < 2) return createUser(attempt + 1)
-        throw error
-      }
+})
+    } catch (error: any) {
+      // An extremely unlikely referral-code collision is safe to retry.
+      if (error?.code === 'P2002' && attempt < 2) return createUser(attempt + 1)
+      throw error
     }
 
     const createdUser = await createUser()
@@ -184,10 +161,30 @@ export const approveUser = async (req: AuthRequest, res: Response): Promise<void
         lastName: true,
         isActive: true,
         isVerified: true,
+        referredById: true,
       },
     })
 
-    res.status(200).json({ success: true, message: 'User approved', data: user })
+    // Give referral bonus only when referred user is verified
+    if (user.referredById) {
+      const incremented = await prisma.user.updateMany({
+        where: { id: user.referredById, referralCycleCount: { lt: 20 } },
+        data: { referralCycleCount: { increment: 1 }, referralBalance: { increment: 5 } },
+      })
+      if (incremented.count) {
+        const updatedReferrer = await prisma.user.findUnique({
+          where: { id: user.referredById },
+          select: { referralCycleCount: true },
+        })
+        if (updatedReferrer?.referralCycleCount === 20) {
+          await prisma.referralBonus.create({
+            data: { referrerId: user.referredById, beneficiaryId: user.referredById, eligibleAt: new Date() },
+          })
+        }
+      }
+    }
+
+    res.status(200).json({ success: true, message: 'User approved', data: { ...user, referredById: undefined } })
   } catch (error) {
     console.error('Approve user error:', error)
     res.status(500).json({ success: false, message: 'Server error' })

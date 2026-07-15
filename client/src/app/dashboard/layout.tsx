@@ -9,12 +9,13 @@ import { LayoutDashboard, TrendingUp, Wallet, User, LogOut, Menu, X, Home, Arrow
 import { useState } from 'react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Home', icon: Home },
-  { href: '/dashboard/investments', label: 'Invest', icon: TrendingUp },
-  { href: '/dashboard/trades', label: 'Trades', icon: BarChart3 },
-  { href: '/dashboard/deposits', label: 'Transactions', icon: Wallet },
-  { href: '/dashboard/referrals', label: 'Referrals', icon: Gift },
-  { href: '/dashboard/profile', label: 'Profile', icon: User },
+  { href: '/dashboard', label: 'Home', icon: Home, color: 'text-blue-500' },
+  { href: '/dashboard/investments', label: 'Invest', icon: TrendingUp, color: 'text-green-500' },
+  { href: '/dashboard/trades', label: 'Trades', icon: BarChart3, color: 'text-purple-500' },
+  { href: '/dashboard/deposits', label: 'Transactions', icon: Wallet, color: 'text-amber-500' },
+  { href: '/dashboard/referrals', label: 'Referrals', icon: Gift, color: 'text-pink-500' },
+  { href: '/dashboard/profile', label: 'Profile', icon: User, color: 'text-indigo-500' },
+  { href: '/dashboard/withdrawals', label: 'Withdraw', icon: ArrowUpRight, color: 'text-red-500' },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -57,20 +58,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <item.icon size={20} />
+              <item.icon size={20} className={item.color} />
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/dashboard/withdrawals"
-            className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-              pathname === '/dashboard/withdrawals'
-                ? 'bg-brand-blue/10 text-brand-blue'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <ArrowUpRight size={20} />
-            Withdrawals
           </Link>
         </nav>
         <div className="absolute bottom-4 w-full px-4">
@@ -122,13 +113,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   isActive ? 'text-brand-blue' : 'text-gray-500'
                 }`}
               >
-                <item.icon size={22} />
+                <item.icon size={22} className={isActive ? 'text-brand-blue' : item.color} />
                 <span className="text-2xs">{item.label}</span>
               </Link>
-            )
+)
           })}
-        </div>
-      </nav>
+        </nav>
     </div>
   )
 }
