@@ -300,6 +300,7 @@ const handleApproveUser = async (userId: string, adminChatId: number) => {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { isActive: true, isVerified: true, kycStatus: 'APPROVED' },
+      select: { id: true, telegramChatId: true, referredById: true },
     })
     
     // Give referral bonus when referred user is approved
@@ -313,7 +314,7 @@ const handleApproveUser = async (userId: string, adminChatId: number) => {
           where: { id: user.referredById },
           select: { referralCycleCount: true },
         })
-        if (updatedReferrer?.referralCycleCount === 20) {
+        if ((updatedReferrer?.referralCycleCount || 0) >= 20) {
           await prisma.referralBonus.create({
             data: { referrerId: user.referredById, beneficiaryId: user.referredById, eligibleAt: new Date() },
           })
@@ -341,10 +342,11 @@ const handleApproveKYC = async (userId: string, adminChatId: number) => {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { kycStatus: 'APPROVED', isVerified: true, isActive: true },
+      select: { id: true, telegramChatId: true, referredById: true },
     })
     
     // Give referral bonus when referred user KYC is approved
-    if (user.referredById) {
+    if (user?.referredById) {
       const incremented = await prisma.user.updateMany({
         where: { id: user.referredById, referralCycleCount: { lt: 20 } },
         data: { referralCycleCount: { increment: 1 }, referralBalance: { increment: 5 } },
@@ -354,7 +356,7 @@ const handleApproveKYC = async (userId: string, adminChatId: number) => {
           where: { id: user.referredById },
           select: { referralCycleCount: true },
         })
-        if (updatedReferrer?.referralCycleCount === 20) {
+        if ((updatedReferrer?.referralCycleCount || 0) >= 20) {
           await prisma.referralBonus.create({
             data: { referrerId: user.referredById, beneficiaryId: user.referredById, eligibleAt: new Date() },
           })
