@@ -22,6 +22,8 @@ out
 dist
 **/dist
 client/tsconfig.tsbuildinfo
+mobile/.expo
+mobile/dist
 
 # Database
 *.db

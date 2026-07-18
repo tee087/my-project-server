@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "EcoCash Investment",
+    "slug": "ecocash-investment",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "scheme": "ecocashinvestment",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ecocashinvestment.app"
+    },
+    "android": {
+      "package": "com.ecocashinvestment.app"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
