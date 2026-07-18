@@ -118,7 +118,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       // Get token for authorization
       const token = localStorage.getItem('token')
       
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ecocash-investment-server.vercel.app/api'
       // Use fetch directly to avoid axios JSON content-type interference
       const response = await fetch(`${API_URL}/auth/kyc`, {
         method: 'POST',
