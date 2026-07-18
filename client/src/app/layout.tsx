@@ -5,7 +5,7 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ecocash-investment-copmanyzm.vercel.app'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 const shareDescription =
   'Unlock investment opportunities in Cryptocurrencies, Forex, Commodities, Indices, and more. Our advanced trading system analyzes the markets and executes trades on your behalf with fast execution and competitive returns. Trades are completed within approximately 6 hours, with profits distributed automatically according to the platform’s investment model.'

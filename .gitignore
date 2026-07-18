@@ -16,6 +16,8 @@ server/.env.production
 # Build output
 .next
 **/.next
+.open-next
+**/.open-next
 out
 dist
 **/dist

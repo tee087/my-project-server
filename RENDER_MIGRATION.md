@@ -1,6 +1,6 @@
 # Render Migration Guide
 
-Deploy the Express server to Render and keep the Next.js client on Vercel.
+Deploy the Express server to Render and the Next.js client to Cloudflare Workers.
 
 ## Deploy the server
 
@@ -12,7 +12,7 @@ Deploy the Express server to Render and keep the Next.js client on Vercel.
    - `TELEGRAM_ADMIN_CHAT_ID`
    - `JWT_SECRET` (long random secret)
    - `TELEGRAM_WEBHOOK_SECRET` (long random secret)
-   - `FRONTEND_URL` (your Vercel client URL)
+   - `FRONTEND_URL` (your Cloudflare Worker client URL, such as `https://ecocash-investment-client.<account>.workers.dev`)
 4. Deploy. The health check is available at `/api/health`.
 
 ## Set the Telegram webhook
@@ -27,13 +27,14 @@ Use the exact same `TELEGRAM_WEBHOOK_SECRET` value configured in Render. Telegra
 
 ## Update the frontend
 
-In Vercel, set `NEXT_PUBLIC_API_URL` to:
+In Cloudflare Workers, set these Build Variables and secrets:
 
 ```text
-https://<YOUR-RENDER-SERVICE>.onrender.com/api
+NEXT_PUBLIC_API_URL=https://<YOUR-RENDER-SERVICE>.onrender.com/api
+NEXT_PUBLIC_SITE_URL=https://<YOUR-WORKER-URL>
 ```
 
-Redeploy the frontend, then send the bot a command and check the Render logs to verify delivery.
+Deploy from `client` with `npm run deploy`, then send the bot a command and check the Render logs to verify delivery.
 
 ## Important
 
