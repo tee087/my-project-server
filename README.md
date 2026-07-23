@@ -103,16 +103,13 @@ After seeding:
    - `TELEGRAM_ADMIN_CHAT_ID` - Admin chat ID
    - `JWT_SECRET` - Strong JWT secret
    - `BOT_SECRET` - Bot secret for verification
-   - `FRONTEND_URL` - your Cloudflare Worker URL (for example, `https://ecocash-investment-client.<account>.workers.dev`)
+   - `FRONTEND_URL` - `https://ecocash-investment-copmanyzm.vercel.app`
 6. Deploy - Render will auto-detect from `render.yaml`
 
-### Cloudflare Workers (For Frontend)
+### Vercel (For Frontend)
 
-1. In Cloudflare, create a **Worker** from this repository with `client` as the root directory, or deploy from the CLI with `cd client && npm run deploy`.
-2. Set these Cloudflare **Build Variables and secrets**:
-   - `NEXT_PUBLIC_API_URL=https://<YOUR-RENDER-SERVICE>.onrender.com/api`
-   - `NEXT_PUBLIC_SITE_URL=https://<YOUR-WORKER-URL>`
-3. Set Render's `FRONTEND_URL` to the same Worker URL, then redeploy Render so the API accepts browser requests from the client.
+1. Deploy the `client` directory to Vercel
+2. Set environment variable: `NEXT_PUBLIC_API_URL=https://ecocash-api.onrender.com/api`
 
 ### Production Build
 
