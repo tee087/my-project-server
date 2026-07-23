@@ -63,10 +63,15 @@ router.post('/', async (req: Request, res: Response) => {
 })
 
 const answerCallback = async (callbackQueryId: string, text?: string) => {
-  if (!BOT_TOKEN) return
+  if (!BOT_TOKEN) {
+    console.error('answerCallback: BOT_TOKEN not configured')
+    return
+  }
   try {
     const bot = new TelegramBot(BOT_TOKEN, { polling: false })
+    console.log(`answerCallback: Answering callbackQueryId=${callbackQueryId}`)
     await bot.answerCallbackQuery(callbackQueryId, { text: text || 'Processed' })
+    console.log(`answerCallback: Successfully answered callbackQueryId=${callbackQueryId}`)
   } catch (err) {
     console.error('Answer callback error:', err)
   }
@@ -77,12 +82,16 @@ router.post('/webhook', async (req, res) => {
                           req.headers['x-telegram-bot-api-secret-token'] as string | undefined
     const validSecret = process.env.BOT_SECRET || process.env.TELEGRAM_WEBHOOK_SECRET || ''
     
-    if (validSecret && receivedSecret !== validSecret) {
-      console.warn('Rejected Telegram webhook - secret token mismatch')
-      res.sendStatus(200) // Return 200 to avoid Telegram retries
-      return
+    if (validSecret) {
+      if (receivedSecret !== validSecret) {
+        console.warn(`Rejected Telegram webhook - secret token mismatch. Expected: ${validSecret}, Received: ${receivedSecret || 'undefined'}`)
+        res.sendStatus(200)
+        return
+      }
     }
 
+    console.log('Received Telegram update:', JSON.stringify(req.body, null, 2).substring(0, 500))
+    
     res.sendStatus(200)
     try {
       const body = req.body
@@ -303,10 +312,15 @@ router.post('/webhook', async (req, res) => {
   })
 
 const sendMessage = async (chatId: number, text: string, options?: TelegramBot.SendMessageOptions) => {
-  if (!BOT_TOKEN) return
+  if (!BOT_TOKEN) {
+    console.error('sendMessage: BOT_TOKEN not configured')
+    return
+  }
   try {
     const bot = new TelegramBot(BOT_TOKEN, { polling: false })
+    console.log(`sendMessage: Sending to chatId=${chatId}, text="${text.substring(0, 100)}..."`)
     await bot.sendMessage(chatId, text, options)
+    console.log(`sendMessage: Successfully sent to chatId=${chatId}`)
   } catch (error) {
     console.error('Send message error:', error)
   }
