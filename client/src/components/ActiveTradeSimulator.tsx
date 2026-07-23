@@ -74,7 +74,7 @@ export default function ActiveTradeSimulator({ investmentId, depositAmount, curr
         entryPrice: currentPrice,
         entryTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
         signal: currentPrice < 107234.52 ? 'LONG' : 'SHORT',
-        reason: 'Entry triggered after admin approval and market liquidity confirmation.',
+        reason: 'Entry triggered after system verification and market liquidity confirmation.',
       })
     }
   }, [status])
@@ -176,7 +176,7 @@ export default function ActiveTradeSimulator({ investmentId, depositAmount, curr
       <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
         {/* Chart Area - TradingView */}
         <div className="flex-1 border-r border-[#2B2F36] bg-[#0B0E11] relative min-h-[420px] overflow-hidden">
-          <TradingViewWidget symbol="BINANCE:BTCUSDT" height={400} />
+          <TradingViewWidget symbol={`BINANCE:BTCUSDT`} height={400} />
           <div className="absolute top-2 left-2 right-48 bg-[#181A20]/85 backdrop-blur-sm rounded-lg border border-[#2B2F36] p-2.5 text-[10px] pointer-events-none max-w-md">
             {analysis && (
               <>

@@ -41,7 +41,7 @@ export default function WaitingApprovalPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-brand-blue/5 p-4">
       <div className="w-full max-w-md text-center">
-        <div className="rounded-3xl bg-white p-8 shadow-xl border border-gray-100">
+        <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-8 shadow-xl">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-blue to-brand-sky">
             <Clock className="h-8 w-8 text-white animate-pulse" />
           </div>

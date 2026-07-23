@@ -10,6 +10,27 @@ const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET || ''
 
 const router = Router()
 
+router.get('/', (req: Request, res: Response) => {
+  res.json({ 
+    success: true, 
+    message: 'Telegram bot endpoint ready', 
+    webhookPath: '/webhook',
+    telegram: {
+      status: 'operational',
+      botTokenConfigured: !!BOT_TOKEN,
+      adminChatIdConfigured: !!ADMIN_CHAT_ID
+    }
+  })
+})
+
+router.get('/webhook', async (req: Request, res: Response) => {
+  res.json({ 
+    success: true, 
+    message: 'Webhook endpoint is active',
+    timestamp: new Date().toISOString()
+  })
+})
+
 router.post('/', async (req: Request, res: Response) => {
   const secret = req.headers['x-bot-secret'] as string | undefined || 
                  (req.headers['x-telegram-bot-api-secret-token'] as string | undefined)
@@ -71,7 +92,7 @@ router.post('/webhook', async (req, res) => {
       const text = body.message.text
 
       if (text === '/start') {
-        await sendMessage(chatId, 'Welcome to EcoCash Investment Bot\n\nCommands:\n/pending - View pending actions\n/users - List all users\n/investments - List investments')
+        await sendMessage(chatId, 'Welcome to EcoCash Investment Bot\n\nCommands:\n/pending - View pending actions\n/users - List active users\n/investments - View investments\n/help - Show help')
       } else if (String(chatId) !== ADMIN_CHAT_ID) {
         console.warn(`Rejected Telegram command from non-admin chat ${chatId}`)
         await sendMessage(chatId, '❌ This command is restricted to the bot administrator.')
@@ -85,6 +106,44 @@ router.post('/webhook', async (req, res) => {
           ? `Pending Approvals:\n${pending.map((d: any) => `- ${d.user?.email}: $${d.amount}`).join('\n')}`
           : 'No pending actions.'
         await sendMessage(chatId, msg)
+      } else if (text === '/users') {
+        const users = await prisma.user.findMany({
+          where: { isActive: true },
+          select: { email: true, isActive: true, kycStatus: true, walletBalance: true, referralBalance: true },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        })
+        if (users.length === 0) {
+          await sendMessage(chatId, 'No active users found.')
+        } else {
+          const userList = users.map((u: any) => 
+            `- ${u.email} | Balance: $${u.walletBalance} | KYC: ${u.kycStatus}`
+          ).join('\n')
+          await sendMessage(chatId, `👥 Active Users:\n${userList}`)
+        }
+      } else if (text === '/investments') {
+        const investments = await prisma.investment.findMany({
+          where: { status: { in: ['PAYMENT_RECEIVED', 'ACTIVE_TRADE', 'COMPLETED'] } },
+          include: { user: true, plan: true },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        })
+        if (investments.length === 0) {
+          await sendMessage(chatId, 'No active investments found.')
+        } else {
+          const invList = investments.map((i: any) => 
+            `- ${i.investmentId} | User: ${i.user?.email} | Status: ${i.status} | Balance: $${i.currentBalance}`
+          ).join('\n')
+          await sendMessage(chatId, `💰 Active Investments:\n${invList}`)
+        }
+      } else if (text === '/help') {
+        await sendMessage(chatId, '📋 EcoCash Bot Commands:\n\n' +
+          '/start - Start the bot\n' +
+          '/help - Show this help\n' +
+          '/pending - View pending deposits\n' +
+          '/users - List active users\n' +
+          '/investments - View active investments\n' +
+          'ecocash:number,accountName - Submit EcoCash payment details')
       } else if (text.toLowerCase().startsWith('ecocash:')) {
         const parts = text.substring(8).split(',')
         if (parts.length >= 2) {

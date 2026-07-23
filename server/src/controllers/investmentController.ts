@@ -156,7 +156,22 @@ export const startTrade = async (req: AuthRequest, res: Response): Promise<void>
   try {
     const { id } = req.params
 
-    const investment = await prisma.investment.update({
+    const investment = await prisma.investment.findUnique({
+      where: { id },
+      include: { deposits: { where: { status: 'PAYMENT_RECEIVED' }, select: { id: true } } },
+    })
+
+    if (!investment) {
+      res.status(404).json({ success: false, message: 'Investment not found' })
+      return
+    }
+
+    if (investment.status !== 'PAYMENT_RECEIVED' || investment.deposits.length === 0) {
+      res.status(400).json({ success: false, message: 'A confirmed payment is required before a trade can start.' })
+      return
+    }
+
+    const startedInvestment = await prisma.investment.update({
       where: { id },
       data: {
         status: 'ACTIVE_TRADE',
@@ -165,7 +180,7 @@ export const startTrade = async (req: AuthRequest, res: Response): Promise<void>
       include: { user: true },
     })
 
-    res.status(200).json({ success: true, message: 'Trade started', data: investment })
+    res.status(200).json({ success: true, message: 'Trade started', data: startedInvestment })
   } catch (error) {
     console.error('Start trade error:', error)
     res.status(500).json({ success: false, message: 'Server error' })
@@ -214,6 +229,41 @@ export const rejectInvestment = async (req: AuthRequest, res: Response): Promise
   }
 }
 
+export const stopTrade = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params
+
+    const investment = await prisma.investment.findUnique({
+      where: { id },
+      include: { user: true },
+    })
+
+    if (!investment) {
+      res.status(404).json({ success: false, message: 'Investment not found' })
+      return
+    }
+
+    if (investment.status !== 'ACTIVE_TRADE') {
+      res.status(400).json({ success: false, message: 'Only active trades can be stopped' })
+      return
+    }
+
+    const updatedInvestment = await prisma.investment.update({
+      where: { id },
+      data: {
+        status: 'TRADE_ENDED',
+        tradeEndDate: new Date(),
+      },
+      include: { user: true },
+    })
+
+    res.status(200).json({ success: true, message: 'Trade ended', data: updatedInvestment })
+  } catch (error) {
+    console.error('Stop trade error:', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
 export const notifyUserTradeAction = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { id } = req.params
@@ -239,8 +289,8 @@ export const notifyUserTradeAction = async (req: AuthRequest, res: Response): Pr
     const ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID
     if (ADMIN_CHAT_ID) {
       const msg = action === 'stop'
-        ? `🛑 USER STOP REQUEST: Investment #${investment.investmentId} by ${investment.user.firstName} - User wants to stop the trade.`
-        : `▶️ USER CONTINUE REQUEST: Investment #${investment.investmentId} by ${investment.user.firstName} - User wants to continue trading.`
+      ? `🛑 USER STOP REQUEST: Investment #${investment.investmentId} by ${investment.user.firstName} - User wants to stop the trade.`
+      : `▶️ USER CONTINUE REQUEST: Investment #${investment.investmentId} by ${investment.user.firstName} - User wants to continue trading.`
       await sendTelegramMessage(msg)
     }
 

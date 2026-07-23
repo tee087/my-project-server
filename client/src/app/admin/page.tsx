@@ -32,7 +32,7 @@ export default function AdminDashboardPage() {
       <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Users</p>
@@ -41,7 +41,7 @@ export default function AdminDashboardPage() {
             <div className="rounded-lg bg-blue-50 p-3"><Users className="h-6 w-6 text-blue-600" /></div>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Investments</p>
@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
             <div className="rounded-lg bg-brand-blue/10 p-3"><TrendingUp className="h-6 w-6 text-brand-blue" /></div>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Active Trades</p>
@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
             <div className="rounded-lg bg-green-50 p-3"><TrendingUp className="h-6 w-6 text-green-600" /></div>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pending Deposits</p>
@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
             <div className="rounded-lg bg-yellow-50 p-3"><Clock className="h-6 w-6 text-yellow-600" /></div>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pending Withdrawals</p>
@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
             <div className="rounded-lg bg-red-50 p-3"><Wallet className="h-6 w-6 text-red-600" /></div>
           </div>
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Deposited</p>

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getInvestments, getInvestment, createInvestment, updateInvestmentProfit, startTrade, closeTrade, getPlans, rejectInvestment, notifyUserTradeAction } from '../controllers/investmentController.js'
+import { getInvestments, getInvestment, createInvestment, updateInvestmentProfit, startTrade, closeTrade, stopTrade, getPlans, rejectInvestment, notifyUserTradeAction } from '../controllers/investmentController.js'
 import { authenticateToken, requireAdmin } from '../middleware/auth.js'
 
 const router = Router()
@@ -28,8 +28,9 @@ router.get('/:id', getInvestment)
 router.post('/', createInvestment)
 router.put('/:id/profit', requireAdmin, updateInvestmentProfit)
 router.put('/:id/update-profit', requireAdmin, updateInvestmentProfit)
-router.put('/:id/start-trade', startTrade)
-router.put('/:id/close-trade', closeTrade)
+router.put('/:id/start-trade', requireAdmin, startTrade)
+router.put('/:id/close-trade', requireAdmin, closeTrade)
+router.put('/:id/stop-trade', authenticateToken, stopTrade)
 router.post('/:id/user-action', notifyUserTradeAction)
 
 export default router

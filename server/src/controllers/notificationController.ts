@@ -4,6 +4,85 @@ import { sendTelegramMessage } from '../services/telegramService.js'
 import { prisma } from '../config/db.js'
 import { pendingProfitForAdmin } from '../utils/telegramState.js'
 
+type MarketNews = { title: string; link: string; source: string; publishedAt: string }
+let marketNewsCache: { expiresAt: number; items: MarketNews[] } | null = null
+
+const decodeXml = (value: string) => value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+
+const NEWS_FEEDS = [
+  'https://www.coindesk.com/arc/outboundfeeds/rss/',
+  'https://cointelegraph.com/feed',
+]
+
+export const getMarketNews = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (marketNewsCache && marketNewsCache.expiresAt > Date.now()) {
+      res.json({ success: true, data: marketNewsCache.items })
+      return
+    }
+    
+    const allItems: MarketNews[] = []
+    for (const feedUrl of NEWS_FEEDS) {
+      try {
+        const response = await fetch(feedUrl)
+        if (!response.ok) continue
+        const xml = await response.text()
+        const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 6).flatMap((match) => {
+          const item = match[1]
+          const field = (name: string) => decodeXml(item.match(new RegExp(`<${name}>([\\s\\S]*?)<\\/${name}>`))?.[1] || '')
+          const title = field('title')
+          const link = field('link')
+          return title && link ? [{ title, link, source: field('source') || 'Crypto News', publishedAt: field('pubDate') }] : []
+        })
+        allItems.push(...items)
+      } catch (e) {
+        console.error(`Failed to fetch ${feedUrl}:`, e)
+      }
+    }
+    
+    const uniqueItems = allItems.slice(0, 10)
+    marketNewsCache = { items: uniqueItems, expiresAt: Date.now() + 12 * 60 * 60 * 1000 }
+    res.json({ success: true, data: uniqueItems })
+  } catch (error) {
+    console.error('Market news error:', error)
+    res.status(502).json({ success: false, message: 'Unable to load market news right now.' })
+  }
+}
+
+export const getUnreadNotifications = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id
+    const notifications = await prisma.notification.findMany({
+      where: {
+        userId,
+        isRead: false,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+    res.json({ success: true, data: notifications })
+  } catch (error) {
+    console.error('Get unread notifications error:', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
+export const markNotificationsRead = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id
+    const { ids } = req.body as { ids?: string[] }
+    if (ids && ids.length) {
+      await prisma.notification.updateMany({ where: { id: { in: ids }, userId }, data: { isRead: true } })
+    } else {
+      // mark all unread as read
+      await prisma.notification.updateMany({ where: { userId, isRead: false }, data: { isRead: true } })
+    }
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Mark notifications read error:', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
 export const requestProfit = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id

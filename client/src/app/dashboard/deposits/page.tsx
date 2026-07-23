@@ -12,6 +12,8 @@ export default function DepositsPage() {
 
   useEffect(() => {
     fetchDeposits()
+    const id = window.setInterval(fetchDeposits, 10_000)
+    return () => window.clearInterval(id)
   }, [])
 
   const fetchDeposits = async () => {
@@ -37,15 +39,15 @@ export default function DepositsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Transaction History</h1>
 
-      <div className="rounded-3xl border bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">EcoCash Instructions</h3>
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">Minimum Amount: <span className="font-bold text-brand-blue">$50</span></p>
+          <p className="text-sm text-gray-600">Minimum Amount: <span className="font-bold text-brand-blue">$100</span></p>
           <p className="text-sm text-gray-600">Please wait for EcoCash payment details from the administrator after submitting your investment request.</p>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] shadow-sm">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr className="border-b text-left text-sm font-medium text-gray-600">

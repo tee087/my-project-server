@@ -83,14 +83,14 @@ export default function ReferralsPage() {
           <div className="max-w-xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold"><Gift size={15} /> Referral rewards</div>
             <h1 className="text-3xl font-bold tracking-tight">Share your link. Grow together.</h1>
-            <p className="mt-3 text-sm leading-6 text-cyan-50">Each completed registration adds $5 to your referral balance. Fill all 20 slots to reach $100, then submit your claim for admin approval.</p>
+            <p className="mt-3 text-sm leading-6 text-cyan-50">Each completed registration adds $5 to your referral balance. Fill all 20 slots to reach $100, then submit your claim for review by our team.</p>
           </div>
           <div className="rounded-2xl bg-white/15 px-5 py-4 backdrop-blur"><p className="text-xs uppercase tracking-wider text-cyan-100">Available to claim</p><p className="mt-1 text-3xl font-bold">${summary.eligibleAmount.toFixed(2)}</p></div>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm md:col-span-2">
+        <div className="rounded-2xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] p-5 shadow-sm md:col-span-2">
           <div className="flex items-center justify-between"><div><p className="text-sm font-semibold text-gray-900">Registration progress</p><p className="mt-1 text-sm text-gray-500">{summary.registeredReferrals} of {summary.requiredReferrals} friends registered</p></div><Users className="text-brand-blue" size={28} /></div>
           <div className="mt-5 flex gap-1" aria-label={`${summary.registeredReferrals} of 20 referral slots filled`}>
             {Array.from({ length: summary.requiredReferrals }, (_, index) => <div key={index} className={`h-7 flex-1 rounded-sm transition-all ${index < summary.registeredReferrals ? 'bg-gradient-to-t from-brand-blue to-cyan-400 shadow-sm shadow-cyan-200' : 'bg-slate-100'}`} />)}
@@ -101,14 +101,14 @@ export default function ReferralsPage() {
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5"><WalletCards className="text-emerald-600" size={26} /><p className="mt-4 text-sm font-semibold text-emerald-950">${summary.walletBalance.toFixed(2)} dashboard rewards</p><p className="mt-1 text-xs text-emerald-700">{summary.canWithdrawReferralRewards ? 'Withdrawable: you have a confirmed package deposit.' : 'Complete a confirmed package deposit before these rewards can be withdrawn.'}</p></div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-2xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] p-5 shadow-sm sm:p-6">
         <p className="text-sm font-semibold text-gray-900">Your personal invite link</p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row"><div className="min-w-0 flex-1 truncate rounded-xl border bg-slate-50 px-4 py-3 font-mono text-xs text-gray-600">{referralLink}</div><button onClick={copyLink} className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-blue px-4 py-3 text-sm font-semibold text-brand-blue transition hover:bg-brand-blue/5"><Clipboard size={17} /> Copy</button></div>
         <button onClick={share} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-blue via-blue-600 to-cyan-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 sm:w-auto"><Share2 size={18} /> Share your link & earn $100</button>
       </section>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-semibold text-gray-900">Claim your unlocked rewards</h2><p className="mt-1 text-sm text-gray-500">A Telegram approval request is sent to the administrator immediately.</p></div><button disabled={!summary.eligibleAmount || claiming} onClick={claim} className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-45"><CheckCircle2 size={17} />{claiming ? 'Submitting…' : `Claim $${summary.eligibleAmount.toFixed(2)}`}</button></div>
+      <section className="rounded-2xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-semibold text-gray-900">Claim your unlocked rewards</h2><p className="mt-1 text-sm text-gray-500">An approval request is sent to the administrator immediately.</p></div><button disabled={!summary.eligibleAmount || claiming} onClick={claim} className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-45"><CheckCircle2 size={17} />{claiming ? 'Submitting…' : `Claim $${summary.eligibleAmount.toFixed(2)}`}</button></div>
         {summary.claims.length > 0 && <div className="mt-5 border-t pt-4"><p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Recent claims</p><div className="space-y-2">{summary.claims.map((claim) => <div key={claim.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3 text-sm"><span className="font-medium text-gray-800">${claim.amount.toFixed(2)} · {claim.bonusCount} rewards</span><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(claim.status)}`}>{claim.status.replace('_', ' ')}</span></div>)}</div></div>}
       </section>
     </div>

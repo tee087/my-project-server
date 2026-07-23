@@ -1,93 +1,146 @@
-import { useEffect, useRef, useState } from 'react'
-import {
-  ActivityIndicator,
-  BackHandler,
-  Linking,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
-import { WebView } from 'react-native-webview'
-import type { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes'
+import { useEffect, useState, useRef } from 'react'
+import { View, Text, StyleSheet, Animated, ActivityIndicator } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { useAuth } from '@/context/AuthContext'
+import { useTheme } from '@/context/ThemeContext'
 
-const appUrl = process.env.EXPO_PUBLIC_APP_URL
-
-function SetupRequired() {
-  return (
-    <SafeAreaView style={styles.setup}>
-      <Text style={styles.title}>EcoCash Investment</Text>
-      <Text style={styles.copy}>
-        Set EXPO_PUBLIC_APP_URL in mobile/.env to the HTTPS address of the deployed web application, then restart Expo.
-      </Text>
-    </SafeAreaView>
-  )
-}
-
-export default function HomeScreen() {
-  const webView = useRef<WebView>(null)
-  const [canGoBack, setCanGoBack] = useState(false)
-  const [loading, setLoading] = useState(true)
+export default function Index() {
+  const { token, user, loading } = useAuth()
+  const { theme } = useTheme()
+  const router = useRouter()
+  const [showSplash, setShowSplash] = useState(true)
+  const opacity = useRef(new Animated.Value(0)).current
+  const scale = useRef(new Animated.Value(0.8)).current
+  const progress = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
-    if (Platform.OS !== 'android') return
+    if (loading) return
 
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (!canGoBack) return false
-      webView.current?.goBack()
-      return true
-    })
-    return () => subscription.remove()
-  }, [canGoBack])
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, tension: 50, friction: 5, useNativeDriver: true }),
+      Animated.timing(progress, { toValue: 1, duration: 1000, useNativeDriver: false }),
+    ]).start()
 
-  if (!appUrl) return <SetupRequired />
+    const timer = setTimeout(() => {
+      setShowSplash(false)
+      if (token) {
+        if (user?.kycStatus === 'APPROVED') {
+          router.replace('/(tabs)/dashboard')
+        } else {
+          router.replace('/waiting-approval')
+        }
+      } else {
+        router.replace('/login')
+      }
+    }, 1000)
 
-  const isInternalUrl = (url: string) => url.startsWith(appUrl)
+    return () => clearTimeout(timer)
+  }, [loading, token, user?.kycStatus, router, opacity, scale, progress])
 
-  const handleNavigation = (request: WebViewNavigation) => {
-    if (isInternalUrl(request.url)) return true
-    void Linking.openURL(request.url)
-    return false
+  const backgroundColor = theme === 'dark' ? '#111827' : '#ffffff'
+  const textColor = theme === 'dark' ? '#ffffff' : '#111827'
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator color="#0045a0" size="large" />
+      </SafeAreaView>
+    )
   }
 
+  if (!showSplash) return null
+
   return (
-    <SafeAreaView style={styles.container}>
-      <WebView
-        ref={webView}
-        source={{ uri: appUrl }}
-        originWhitelist={['https://*', 'http://*']}
-        javaScriptEnabled
-        domStorageEnabled
-        sharedCookiesEnabled
-        thirdPartyCookiesEnabled
-        setSupportMultipleWindows={false}
-        onShouldStartLoadWithRequest={handleNavigation}
-        onNavigationStateChange={(navigation) => setCanGoBack(navigation.canGoBack)}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-      />
-      {loading && (
-        <View style={styles.loading} pointerEvents="none">
-          <ActivityIndicator color="#007a3d" size="large" />
+    <View style={[styles.container, { backgroundColor }]}>
+      <Animated.View style={[styles.content, { opacity, transform: [{ scale }] }]}>
+        <View style={styles.logoContainer}>
+          <View style={styles.logo}>
+            <View style={styles.logoTextContainer}>
+              <Text style={[styles.logoBrand, { color: backgroundColor === '#111827' ? '#0045a0' : '#0045a0' }]}>ECO</Text>
+              <Text style={[styles.logoAccent, { color: backgroundColor === '#111827' ? '#ef4444' : '#ef4444' }]}>CASH</Text>
+            </View>
+            <Text style={[styles.tagline, { color: backgroundColor === '#111827' ? '#94a3b8' : '#64748b' }]}>Premium Investment Platform</Text>
+          </View>
         </View>
-      )}
-      {canGoBack && (
-        <Pressable style={styles.back} onPress={() => webView.current?.goBack()}>
-          <Text style={styles.backText}>‹</Text>
-        </Pressable>
-      )}
-    </SafeAreaView>
+
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                {
+                  width: progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                },
+              ]}
+            />
+          </View>
+          <Text style={[styles.loadingText, { color: backgroundColor === '#111827' ? '#64748b' : '#64748b' }]}>Loading...</Text>
+        </View>
+      </Animated.View>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff' },
-  back: { position: 'absolute', right: 16, bottom: 18, width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#007a3d', elevation: 5 },
-  backText: { color: '#ffffff', fontSize: 36, lineHeight: 40, marginTop: -4 },
-  setup: { flex: 1, justifyContent: 'center', padding: 28, backgroundColor: '#ffffff' },
-  title: { color: '#007a3d', fontSize: 27, fontWeight: '700', marginBottom: 16 },
-  copy: { color: '#334155', fontSize: 16, lineHeight: 24 },
+  container: {
+    flex: 1,
+    backgroundColor: '#111827',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    marginBottom: 40,
+  },
+  logo: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  logoTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoBrand: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#0045a0',
+  },
+  logoAccent: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#ef4444',
+  },
+  tagline: {
+    fontSize: 14,
+    color: '#94a3b8',
+    marginTop: 8,
+    fontWeight: '500',
+  },
+  progressContainer: {
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: 150,
+    height: 3,
+    backgroundColor: '#1e293b',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#0045a0',
+    borderRadius: 2,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 12,
+  },
 })

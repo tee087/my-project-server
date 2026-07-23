@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { prisma } from './config/db.js'
 import authRoutes from './routes/auth.js'
 import investmentRoutes from './routes/investments.js'
@@ -12,6 +14,10 @@ import referralRoutes from './routes/referrals.js'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 5000
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const uploadDirectory = process.env.VERCEL || process.env.RENDER
+  ? '/tmp/uploads'
+  : path.join(__dirname, '../public/uploads')
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -41,6 +47,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.use(express.json())
+// Avatars and payment receipts are stored by the API, so serve them from the
+// API host instead of relying on the web or mobile client to have the files.
+app.use('/uploads', express.static(uploadDirectory))
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({

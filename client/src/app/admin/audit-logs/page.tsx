@@ -29,7 +29,7 @@ export default function AdminAuditLogsPage() {
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-white">
+        <div className="overflow-x-auto rounded-xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box]">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr className="border-b text-left text-sm font-medium text-gray-500">

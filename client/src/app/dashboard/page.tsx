@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import toast from 'react-hot-toast'
 import { Wallet, TrendingUp, ArrowUpRight, ArrowDownRight, Zap, TrendingDown, Activity, AlertCircle, X } from 'lucide-react'
 import ActiveTradeSimulator from '@/components/ActiveTradeSimulator'
+import Modal from '@/components/Modal'
 
 export default function DashboardPage() {
   const { user, token } = useAuth()
@@ -34,8 +35,9 @@ export default function DashboardPage() {
         const [investmentResponse, referralResponse] = await Promise.all([api.get('investments'), api.get('referrals')])
         const data = investmentResponse.data
         const userInvestments = data.data || []
-        const activeInv = userInvestments.filter((inv: any) => 
-          inv.status === 'PAYMENT_RECEIVED' || inv.status === 'ACTIVE_TRADE'
+        const activeInv = userInvestments.filter((inv: any) =>
+          inv.status === 'PAYMENT_RECEIVED' || inv.status === 'ACTIVE_TRADE' ||
+          inv.deposits?.some((deposit: any) => deposit.status === 'PAYMENT_RECEIVED')
         )
         const activeCount = activeInv.length
         const totalDeposited = activeInv.reduce((sum: number, inv: any) => sum + Number(inv.depositAmount), 0)
@@ -245,16 +247,7 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="mb-3 text-lg font-semibold text-gray-900">Quick Actions</h2>
-        <div className="grid grid-cols-4 gap-3">
-          <button
-            onClick={() => router.push('/dashboard/deposits')}
-            className="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 shadow-sm border border-gray-100 hover:border-brand-sky/30 hover:shadow-md transition-all duration-200"
-          >
-            <div className="rounded-xl bg-green-50 p-2.5">
-              <ArrowDownRight className="h-4 w-4 text-green-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">Transactions</span>
-          </button>
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={() => router.push('/dashboard/investments')}
             className="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 shadow-sm border border-gray-100 hover:border-brand-sky/30 hover:shadow-md transition-all duration-200"
@@ -380,67 +373,41 @@ export default function DashboardPage() {
       </div>
 
       {showStopPopup && popupInvestment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-brand-blue" />
-                <h3 className="text-lg font-semibold text-gray-900">Trade Action Required</h3>
-              </div>
-              <button onClick={() => setShowStopPopup(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="h-4 w-4" />
-              </button>
+        <Modal open={showStopPopup} onClose={() => setShowStopPopup(false)} panelClassName="max-w-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-brand-blue" />
+              <h3 className="text-lg font-semibold text-slate-900">Trade Action Required</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Your investment #{popupInvestment.investmentId} has generated profit. Would you like to stop the trade or continue?
-            </p>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs text-gray-500">Current P&L:</span>
-              <span className={`text-sm font-bold ${Number(popupInvestment.profitAmount || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {Number(popupInvestment.profitAmount || 0) >= 0 ? '+' : '-'}{formatCurrency(Math.abs(Number(popupInvestment.profitAmount || 0)))}
-              </span>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleTradeAction('stop')}
-                className="flex-1 rounded-lg bg-red-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition-colors"
-              >
-                Stop Trade
-              </button>
-              <button
-                onClick={() => handleTradeAction('continue')}
-                className="flex-1 rounded-lg bg-green-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-600 transition-colors"
-              >
-                Continue
-              </button>
-            </div>
+            <button onClick={() => setShowStopPopup(false)} className="text-slate-500 hover:text-slate-700">
+              <X className="h-4 w-4" />
+            </button>
           </div>
-        </div>
+          <p className="text-sm text-slate-700 mb-4">Your investment #{popupInvestment.investmentId} has generated profit. Would you like to stop the trade or continue?</p>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xs text-slate-500">Current P&L:</span>
+            <span className={`text-sm font-bold ${Number(popupInvestment.profitAmount || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {Number(popupInvestment.profitAmount || 0) >= 0 ? '+' : '-'}{formatCurrency(Math.abs(Number(popupInvestment.profitAmount || 0)))}
+            </span>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={() => handleTradeAction('stop')} className="flex-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:from-red-600 hover:to-red-700 transition-colors">Stop Trade</button>
+            <button onClick={() => handleTradeAction('continue')} className="flex-1 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:from-emerald-600 hover:to-emerald-700 transition-colors">Continue</button>
+          </div>
+        </Modal>
       )}
 
       {showWithdrawalPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Trade Ended</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              You ended the trade. You can now withdraw your profits from the withdrawals page.
-            </p>
-            <button
-              onClick={() => {
-                setShowWithdrawalPopup(false)
-                router.push('/dashboard/withdrawals')
-              }}
-              className="rounded-lg bg-gradient-to-r from-brand-blue to-brand-sky px-6 py-2.5 text-sm font-semibold text-white hover:from-brand-blue/90 hover:to-brand-sky/90 transition-all"
-            >
-              Go to Withdraw
-            </button>
+        <Modal open={showWithdrawalPopup} onClose={() => setShowWithdrawalPopup(false)} panelClassName="max-w-sm text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-        </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Trade Ended</h3>
+          <p className="text-sm text-slate-700 mb-4">You ended the trade. You can now withdraw your profits from the withdrawals page.</p>
+          <button onClick={() => { setShowWithdrawalPopup(false); router.push('/dashboard/withdrawals') }} className="rounded-lg bg-gradient-to-r from-brand-blue to-brand-sky px-6 py-2.5 text-sm font-semibold text-white hover:from-brand-blue/90 hover:to-brand-sky/90 transition-all">Go to Withdraw</button>
+        </Modal>
       )}
     </div>
   )

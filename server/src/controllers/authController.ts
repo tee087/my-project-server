@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 import { randomBytes } from 'crypto'
+import fs from 'fs'
+import path from 'path'
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -314,8 +316,26 @@ export const uploadAvatar = async (req: AuthRequest, res: Response): Promise<voi
       res.status(400).json({ success: false, message: 'No file uploaded' })
       return
     }
+    // Persist the uploaded file into the server uploads folder so the URL
+    // remains stable and is served by the API. Use /tmp/uploads in hosted
+    // environments (Render/Vercel) where the server exposes that path.
+    const baseUploads = process.env.VERCEL || process.env.RENDER ? path.join('/tmp', 'uploads') : path.join(process.cwd(), 'public', 'uploads')
+    const uploadsDir = path.join(baseUploads, 'avatars')
+    try { fs.mkdirSync(uploadsDir, { recursive: true }) } catch (e) {}
 
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`
+    const file = req.file as Express.Multer.File
+    const filename = file.filename || `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
+    const destPath = path.join(uploadsDir, filename)
+
+    try {
+      if (file.path !== destPath) {
+        fs.copyFileSync(file.path, destPath)
+      }
+    } catch (e) {
+      console.error('Failed to copy avatar to uploads dir, falling back to data URI', e)
+    }
+
+    const avatarUrl = `/uploads/avatars/${filename}`
 
     const user = await prisma.user.update({
       where: { id: req.user!.id },

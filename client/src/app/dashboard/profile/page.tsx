@@ -99,9 +99,10 @@ export default function ProfilePage() {
       const res = await api.post('auth/avatar', form)
       console.log('Avatar upload response:', res.data)
       
-      if (res.data?.avatar) {
-        updateUser({ ...user, avatar: res.data.avatar } as any)
-        setAvatarPreview(res.data.avatar)
+      const avatar = res.data?.data?.avatar || res.data?.avatar
+      if (avatar) {
+        updateUser({ ...user, avatar } as any)
+        setAvatarPreview(avatar)
       }
       toast.success('Profile image updated')
     } catch (err: any) {
@@ -145,7 +146,7 @@ export default function ProfilePage() {
         )}
       </h1>
 
-      <div className="rounded-3xl border bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
         {user?.kycStatus === 'SUBMITTED' && (
           <div className="mb-4 rounded-xl bg-yellow-50 p-4 flex items-center gap-2">
             <Shield className="h-5 w-5 text-yellow-600" />
@@ -257,7 +258,7 @@ export default function ProfilePage() {
       </div>
 
       {user?.kycStatus && user.kycStatus !== 'PENDING' && (
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Shield className="h-5 w-5 text-brand-blue" />
             KYC Verification Details

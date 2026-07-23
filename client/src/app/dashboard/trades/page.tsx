@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, MoreHorizontal } from 'lucide-react'
+import TradingViewWidget from '@/components/TradingViewWidget'
 
 type OrderSide = 'buy' | 'sell'
 
@@ -59,72 +60,6 @@ const generateTrades = (basePrice: number): Trade[] => {
   return trades
 }
 
-function TradingViewChart({ symbol }: { symbol: string }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    containerRef.current.innerHTML = ''
-
-    const script = document.createElement('script')
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
-    script.type = 'text/javascript'
-    script.async = true
-    script.onload = () => {
-      if (containerRef.current) {
-        const config = {
-          autosize: true,
-          symbol: `BINANCE:${symbol.replace('/', '')}`,
-          interval: '15',
-          timezone: 'Etc/UTC',
-          theme: 'dark',
-          style: '1',
-          locale: 'en',
-          allow_symbol_change: true,
-          calendar: false,
-          hide_top_toolbar: false,
-          hide_legend: false,
-          save_image: false,
-          hide_volume: false,
-          support_host: 'https://www.tradingview.com',
-          withdateranges: true,
-          studies: [
-            'MASimple@tv-basicstudies',
-            'RSI@tv-basicstudies',
-          ],
-        }
-        const widgetContainer = document.createElement('div')
-        widgetContainer.className = 'tradingview-widget-container__widget'
-        containerRef.current.appendChild(widgetContainer)
-        const widgetDiv = document.createElement('div')
-        widgetDiv.className = 'tradingview-widget-copyright'
-        widgetDiv.style.display = 'none'
-        widgetContainer.appendChild(widgetDiv)
-        if (typeof window !== 'undefined' && (window as any).TradingView) {
-          new (window as any).TradingView.widget({
-            ...config,
-            container_id: widgetContainer.id || `tv-advanced-${symbol.replace('/', '-')}-${Date.now()}`,
-          })
-        }
-      }
-    }
-    containerRef.current.appendChild(script)
-
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ''
-      }
-    }
-  }, [symbol])
-
-  return (
-    <div
-      ref={containerRef}
-      className="tradingview-widget-container w-full h-full min-h-[500px]"
-      style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}
-    />
-  )
-}
 
 export default function TradesPage() {
   const [selectedPair, setSelectedPair] = useState(PAIRS[0])
@@ -211,7 +146,7 @@ export default function TradesPage() {
       <div className="flex flex-col lg:flex-row">
         {/* Chart Area */}
         <div className="flex-1 border-r border-[#2B2F36] bg-[#0B0E11]">
-          <TradingViewChart symbol={selectedPair.symbol} />
+          <TradingViewWidget symbol={`BINANCE:${selectedPair.symbol.replace('/', '')}`} height={560} />
         </div>
 
         {/* Right Sidebar */}

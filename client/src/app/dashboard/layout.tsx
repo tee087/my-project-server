@@ -5,14 +5,13 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, Wallet, User, LogOut, Menu, X, Home, ArrowUpRight, BarChart3, Gift } from 'lucide-react'
+import { TrendingUp, User, LogOut, Menu, X, Home, ArrowUpRight, BarChart3, Gift } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: Home, color: 'text-blue-500' },
   { href: '/dashboard/investments', label: 'Invest', icon: TrendingUp, color: 'text-green-500' },
   { href: '/dashboard/trades', label: 'Trades', icon: BarChart3, color: 'text-purple-500' },
-  { href: '/dashboard/deposits', label: 'Transactions', icon: Wallet, color: 'text-amber-500' },
   { href: '/dashboard/referrals', label: 'Referrals', icon: Gift, color: 'text-pink-500' },
   { href: '/dashboard/profile', label: 'Profile', icon: User, color: 'text-indigo-500' },
   { href: '/dashboard/withdrawals', label: 'Withdraw', icon: ArrowUpRight, color: 'text-red-500' },
@@ -84,18 +83,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-brand-blue to-brand-sky flex items-center justify-center text-sm font-medium text-white">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            <div className="h-8 w-8 overflow-hidden rounded-full bg-gradient-to-br from-brand-blue to-brand-sky flex items-center justify-center text-sm font-medium text-white">
+              {user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>}
             </div>
             <span className="hidden sm:block text-sm font-medium text-gray-900">
               {user?.firstName} {user?.lastName}
             </span>
           </div>
-          {user?.kycStatus === 'APPROVED' && (
-            <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-              Verified
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {user?.kycStatus === 'APPROVED' && (
+              <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                Verified
+              </span>
+            )}
+          </div>
         </header>
         <div className="p-4 lg:p-6 pb-24 lg:pb-6">{children}</div>
       </main>

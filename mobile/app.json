@@ -7,14 +7,28 @@
     "userInterfaceStyle": "light",
     "icon": "./assets/icon.png",
     "scheme": "ecocashinvestment",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111827"
+    },
+    "extra": {
+      "EXPO_PUBLIC_API_URL": "https://my-project-server-xo9x.onrender.com/api"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ecocashinvestment.app"
     },
     "android": {
-      "package": "com.ecocashinvestment.app"
+      "package": "com.ecocashinvestment.app",
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-image-picker",
+      "expo-font"
+    ],
     "experiments": {
       "typedRoutes": true
     }

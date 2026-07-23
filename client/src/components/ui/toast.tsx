@@ -12,23 +12,37 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#fff',
-            color: '#374151',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
+            background: '#ffffff',
+            color: '#0f172a',
+            borderRadius: '14px',
             padding: '12px 16px',
-            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+            boxShadow: '0 10px 25px -10px rgba(2,6,23,0.6)',
+            fontWeight: 600,
+            border: '1px solid transparent',
+            backgroundImage: 'linear-gradient(#ffffff,#ffffff), linear-gradient(135deg,#06b6d4,#7c3aed)',
+            backgroundOrigin: 'padding-box, border-box',
+            backgroundClip: 'padding-box, border-box',
           },
           success: {
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
+            iconTheme: { primary: '#10b981', secondary: '#fff' },
+            style: {
+              background: '#ffffff',
+              color: '#064e3b',
+              border: '1px solid transparent',
+              backgroundImage: 'linear-gradient(#ffffff,#ffffff), linear-gradient(135deg,#10b981,#06b6d4)',
+              backgroundOrigin: 'padding-box, border-box',
+              backgroundClip: 'padding-box, border-box',
             },
           },
           error: {
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+            style: {
+              background: '#ffffff',
+              color: '#7f1d1d',
+              border: '1px solid transparent',
+              backgroundImage: 'linear-gradient(#ffffff,#ffffff), linear-gradient(135deg,#ef4444,#f97316)',
+              backgroundOrigin: 'padding-box, border-box',
+              backgroundClip: 'padding-box, border-box',
             },
           },
         }}

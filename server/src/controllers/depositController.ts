@@ -153,7 +153,6 @@ export const approveDeposit = async (req: AuthRequest, res: Response): Promise<v
   try {
     const { id } = req.params
     const { adminNotes } = req.body
-
     const deposit = await prisma.deposit.findUnique({
       where: { id },
       include: { investment: true },
@@ -164,26 +163,47 @@ export const approveDeposit = async (req: AuthRequest, res: Response): Promise<v
       return
     }
 
-    const updatedDeposit = await prisma.deposit.update({
-      where: { id },
-      data: { status: 'PAYMENT_RECEIVED', adminNotes },
+    // Idempotent approval: only transition deposits that are still PAYMENT_SUBMITTED
+    const txResult = await prisma.$transaction(async (tx) => {
+      const updated = await tx.deposit.updateMany({
+        where: { id, status: 'PAYMENT_SUBMITTED' },
+        data: { status: 'PAYMENT_RECEIVED', adminNotes },
+      })
+
+      // If nothing was updated the deposit was already processed
+      if (!updated.count) return { alreadyProcessed: true }
+
+      // If the deposit belongs to an investment, increment its balance safely
+      if (deposit.investmentId) {
+        await tx.investment.update({
+          where: { id: deposit.investmentId },
+          data: {
+            status: 'PAYMENT_RECEIVED',
+            currentBalance: { increment: Number(deposit.amount) },
+          },
+        })
+
+        await tx.notification.create({
+          data: {
+            userId: deposit.userId,
+            type: 'PAYMENT_APPROVED',
+            title: 'Payment approved',
+            message: `Your $${Number(deposit.amount).toFixed(2)} payment has been approved and is now in your balance.`,
+          },
+        })
+      }
+
+      return { alreadyProcessed: false }
     })
 
-    if (deposit.investmentId) {
-      await prisma.investment.update({
-        where: { id: deposit.investmentId },
-        data: { status: 'PAYMENT_RECEIVED' },
-      })
+    if ((txResult as any).alreadyProcessed) {
+      res.status(200).json({ success: true, message: 'Deposit already processed', data: deposit })
+      return
     }
 
-    res.status(200).json({ 
-      success: true, 
-      message: 'Deposit approved', 
-      data: {
-        ...updatedDeposit,
-        investment: deposit.investment
-      }
-    })
+    const updatedDeposit = await prisma.deposit.findUnique({ where: { id }, include: { investment: true } })
+
+    res.status(200).json({ success: true, message: 'Deposit approved', data: updatedDeposit })
   } catch (error) {
     console.error('Approve deposit error:', error)
     res.status(500).json({ success: false, message: 'Server error' })

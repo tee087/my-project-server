@@ -21,10 +21,12 @@ export default function TradingViewWidget({ symbol = 'NASDAQ:AAPL', width = '100
     script.async = true
     script.onload = () => {
       if (typeof window !== 'undefined' && (window as any).TradingView) {
+        // Ensure the container has an explicit height for the widget to render
+        if (containerRef.current && height) {
+          containerRef.current.style.height = `${height}px`
+        }
         new (window as any).TradingView.widget({
-          autosize: false,
-          width: width,
-          height: height,
+          autosize: true,
           symbol: symbol,
           interval: 'D',
           timezone: timezone,

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import toast from 'react-hot-toast'
 import { User, Calendar, MapPin, CreditCard, Camera, Send, Shield, CheckCircle, FileText, X } from 'lucide-react'
+import Modal from '@/components/Modal'
 
 type DocumentType = 'PASSPORT' | 'NATIONAL_ID' | 'DRIVERS_LICENSE' | 'RESIDENCE_PERMIT'
 
@@ -155,7 +156,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-brand-blue/5 to-brand-blue/10 p-4">
       <div className="w-full max-w-xl">
-        <div className="rounded-3xl bg-white p-6 shadow-xl border border-gray-100">
+        <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-xl">
           <div className="mb-5 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-blue to-brand-sky">
               <Shield className="h-5 w-5 text-white" />
@@ -349,15 +350,9 @@ const handleSubmit = async (e: React.FormEvent) => {
       
       {/* Small Camera Popup */}
       {showCamera && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="relative w-80 max-w-full rounded-xl overflow-hidden border-2 border-brand-blue/20 bg-black shadow-2xl">
-            <button
-              type="button"
-              onClick={() => { setShowCamera(false); if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null } }}
-              className="absolute top-2 right-2 z-10 text-white hover:text-gray-300"
-            >
-              <X className="h-4 w-4" />
-            </button>
+        <Modal open={showCamera} onClose={() => { setShowCamera(false); if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null } }} panelClassName="max-w-xs p-0">
+          <div className="relative w-80 max-w-full rounded-xl overflow-hidden bg-black shadow-2xl border-2 border-[rgba(99,102,241,0.06)]">
+            <button type="button" onClick={() => { setShowCamera(false); if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null } }} className="absolute top-2 right-2 z-10 text-white hover:text-gray-300"><X className="h-4 w-4" /></button>
             <video ref={videoRef} autoPlay playsInline className="w-full" style={{ maxHeight: '280px' }} />
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-2">
               <p className="text-2xs text-white font-medium">Ensure your face is well-lit and centered</p>
@@ -367,7 +362,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               <button type="button" onClick={captureSelfie} className="px-4 py-1 text-xs bg-brand-blue text-white rounded font-medium flex items-center gap-1"><Camera className="h-3.5 w-3.5" /> Capture</button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

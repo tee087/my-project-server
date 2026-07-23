@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext'
 import { api } from '@/lib/api'
 import { TrendingUp, Shield, Zap, Clock, ArrowRight, BarChart3, Check, Activity, ChevronDown, Lock, CreditCard, Package, BarChart2, PieChart as PieChartIcon, X, AlertCircle } from 'lucide-react'
 import TradingViewWidget from '@/components/TradingViewWidget'
+import Modal from '@/components/Modal'
 
 type Plan = {
   id: string
@@ -594,45 +595,33 @@ export default function Home() {
       </footer>
 
       {disclaimerOpen && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-400 rounded-xl max-w-2xl w-full p-5 border border-gray-700">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-bold text-white">Risk Disclaimer</h3>
-              <button
-                onClick={() => setDisclaimerOpen(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="text-gray-300 text-2xs space-y-2 max-h-80 overflow-y-auto">
-              <p>Trading financial instruments carries a high level of risk and may not be suitable for all investors.</p>
-              <p>Possible advantages of CFD trading may include:</p>
-              <ul className="list-disc list-inside space-y-0.5 text-gray-400">
-                <li>Ability to go long or short</li>
-                <li>Leverage trading available</li>
-                <li>Availability across multiple asset classes</li>
-                <li>Free markets data and news</li>
-              </ul>
-              <p>However, there are also significant risks including:</p>
-              <ul className="list-disc list-inside space-y-0.5 text-gray-400">
-                <li>Potential loss of entire investment</li>
-                <li>Leverage can amplify losses</li>
-                <li>Market volatility affects positions</li>
-                <li>Possible exposure to negative balance</li>
-              </ul>
-              <p>You should never invest money you cannot afford to lose. Past performance is not indicative of future results.</p>
-            </div>
-            <div className="mt-5 flex justify-end">
-              <button
-                onClick={() => setDisclaimerOpen(false)}
-                className="px-5 py-1.5 bg-brand-blue text-white rounded-lg hover:bg-brand-blue/80 transition-colors text-sm"
-              >
-                I Understand
-              </button>
-            </div>
+        <Modal open={disclaimerOpen} onClose={() => setDisclaimerOpen(false)} panelClassName="max-w-2xl p-5">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-bold text-white">Risk Disclaimer</h3>
+            <button onClick={() => setDisclaimerOpen(false)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
           </div>
-        </div>
+          <div className="text-gray-300 text-2xs space-y-2 max-h-80 overflow-y-auto">
+            <p>Trading financial instruments carries a high level of risk and may not be suitable for all investors.</p>
+            <p>Possible advantages of CFD trading may include:</p>
+            <ul className="list-disc list-inside space-y-0.5 text-gray-400">
+              <li>Ability to go long or short</li>
+              <li>Leverage trading available</li>
+              <li>Availability across multiple asset classes</li>
+              <li>Free markets data and news</li>
+            </ul>
+            <p>However, there are also significant risks including:</p>
+            <ul className="list-disc list-inside space-y-0.5 text-gray-400">
+              <li>Potential loss of entire investment</li>
+              <li>Leverage can amplify losses</li>
+              <li>Market volatility affects positions</li>
+              <li>Possible exposure to negative balance</li>
+            </ul>
+            <p>You should never invest money you cannot afford to lose. Past performance is not indicative of future results.</p>
+          </div>
+          <div className="mt-5 flex justify-end">
+            <button onClick={() => setDisclaimerOpen(false)} className="px-5 py-1.5 bg-gradient-to-r from-brand-blue to-brand-sky text-white rounded-lg hover:from-brand-blue/90 hover:to-brand-sky/90 transition-colors text-sm">I Understand</button>
+          </div>
+        </Modal>
       )}
     </div>
   )

@@ -353,7 +353,7 @@ export default function InvestmentsPage() {
                 performance: '92% avg win rate',
               },
             ].map((pkg) => (
-              <div key={pkg.level} className="relative rounded-2xl bg-white p-6 shadow-lg border border-gray-100 hover:border-brand-sky/30 transition-all group">
+              <div key={pkg.level} className="relative rounded-2xl border border-transparent bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.20),rgba(56,189,248,.9),rgba(0,69,160,.20))_border-box] p-6 shadow-lg transition-all hover:shadow-xl group">
                 <div className="text-center">
                   <div className={`mx-auto mb-4 inline-flex h-14 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${pkg.color} text-white shadow-lg group-hover:scale-105 transition-transform`}>
                     <TrendingUp className="h-6 w-6" />
@@ -430,8 +430,8 @@ export default function InvestmentsPage() {
                 <div
                   key={plan.id}
                   onClick={() => handleSelectPlan(plan)}
-                  className={`relative cursor-pointer rounded-2xl border-2 bg-white p-6 shadow-lg transition-all hover:shadow-xl ${
-                    isPopular ? 'border-brand-blue/20 ring-2 ring-brand-blue/10' : 'border-gray-100 hover:border-brand-blue/20'
+                  className={`relative cursor-pointer rounded-2xl border-2 border-transparent bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.20),rgba(56,189,248,.9),rgba(0,69,160,.20))_border-box] p-6 shadow-lg transition-all hover:shadow-xl ${
+                    isPopular ? 'ring-2 ring-brand-blue/10' : ''
                   }`}
                 >
                   {isPopular && (
@@ -501,7 +501,7 @@ export default function InvestmentsPage() {
       )}
 
       {view === 'form' && selectedPlan && (
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.12),rgba(56,189,248,.12),rgba(124,58,237,.12))_border-box] p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">
               {selectedPlan.id?.startsWith('learning-') ? 'Complete Learning Package Enrollment' : 'Complete Your Investment'}
@@ -582,7 +582,7 @@ export default function InvestmentsPage() {
       )}
 
       {view === 'pending' && pendingPayment && (
-        <div className="rounded-3xl border bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.08),rgba(56,189,248,.08),rgba(124,58,237,.08))_border-box] p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">
               {pendingPayment.ecocashNumber ? 'Payment Details Received!' : 'Waiting for Payment Details'}
@@ -689,7 +689,7 @@ export default function InvestmentsPage() {
       )}
 
       {view === 'history' && (
-        <div className="overflow-x-auto rounded-3xl border bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-3xl border-2 bg-[linear-gradient(#fff,#fff)_padding-box,linear-gradient(135deg,rgba(0,69,160,.06),rgba(56,189,248,.06),rgba(124,58,237,.06))_border-box] shadow-sm">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr className="border-b text-left text-sm font-medium text-gray-600">
