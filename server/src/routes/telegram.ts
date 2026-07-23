@@ -202,17 +202,20 @@ router.post('/webhook', async (req, res) => {
                   const depositAmount = Number(investment.depositAmount || currentBalance)
                   const newBalance = currentBalance + profitAmount
                   const calculatedPercentage = profitAmount / depositAmount * 100
+                  const existingProfitAmount = Number(investment.profitAmount || 0)
+                  const totalProfitAmount = existingProfitAmount + profitAmount
                   const updated = await prisma.investment.update({
                     where: { id: profitData.id },
                     data: {
                       currentBalance: newBalance,
-                      profitAmount: profitAmount,
+                      profitAmount: totalProfitAmount,
                       profitPercentage: calculatedPercentage,
+                      profitTrackingRequestedAt: new Date(),
                       profitActionRequiredAt: new Date(),
                     },
                     include: { user: true },
                   })
-                  await sendMessage(chatId, `✅ Profit of $${profitAmount} added to investment ${updated.investmentId}. New balance: $${newBalance.toFixed(2)}`)
+                  await sendMessage(chatId, `✅ Profit of $${profitAmount} added to investment ${updated.investmentId}. New balance: $${newBalance.toFixed(2)} | Total profit: $${totalProfitAmount.toFixed(2)}`)
                 } else {
                   await sendMessage(chatId, '❌ Investment not found.')
                 }

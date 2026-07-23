@@ -11,10 +11,10 @@ type Toast = {
 }
 
 type ToastContextType = {
-  showToast: (message: string, type?: ToastType) => void
-  showSuccess: (message: string) => void
-  showError: (message: string) => void
-  showInfo: (message: string) => void
+  showToast: (message: string, type?: ToastType, duration?: number) => void
+  showSuccess: (message: string, duration?: number) => void
+  showError: (message: string, duration?: number) => void
+  showInfo: (message: string, duration?: number) => void
 }
 
 const ToastContext = createContext<ToastContextType | null>(null)
@@ -36,17 +36,17 @@ const TOAST_ICON_COLORS: Record<ToastType, string> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const showToast = (message: string, type: ToastType = 'default') => {
+  const showToast = (message: string, type: ToastType = 'default', duration: number = 1500) => {
     const id = Date.now().toString()
     setToasts(prev => [...prev, { id, message, type }])
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
-    }, 3000)
+    }, duration)
   }
 
-  const showSuccess = (message: string) => showToast(message, 'success')
-  const showError = (message: string) => showToast(message, 'error')
-  const showInfo = (message: string) => showToast(message, 'info')
+  const showSuccess = (message: string, duration?: number) => showToast(message, 'success', duration)
+  const showError = (message: string, duration?: number) => showToast(message, 'error', duration)
+  const showInfo = (message: string, duration?: number) => showToast(message, 'info', duration)
 
   return (
     <ToastContext.Provider value={{ showToast, showSuccess, showError, showInfo }}>
@@ -92,9 +92,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   toast: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -106,14 +106,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toastIcon: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 12,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
   },
   toastText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
   },
 })

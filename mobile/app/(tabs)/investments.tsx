@@ -169,7 +169,8 @@ export default function InvestmentsScreen() {
   }
 
   const uploadReceipt = async () => {
-    if (!pendingPayment?.depositId) {
+    const depositId = pendingPayment?.depositId || pendingPaymentRef.current?.depositId
+    if (!depositId) {
       showError('Error', 'No pending payment to upload receipt for')
       return
     }
@@ -191,7 +192,7 @@ export default function InvestmentsScreen() {
 
       const file = result.assets[0]
       const form = new FormData()
-      form.append('depositId', pendingPayment.depositId)
+      form.append('depositId', depositId)
       form.append('receipt', {
         uri: file.uri,
         name: file.fileName || `receipt-${Date.now()}.jpg`,
