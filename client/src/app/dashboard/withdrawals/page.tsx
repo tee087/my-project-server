@@ -168,19 +168,22 @@ export default function WithdrawalsPage() {
             </div>
             {formData.balanceSource === 'INVESTMENT' && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Investment</label>
+                <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Select Investment</label>
                 <select
                   value={formData.investmentId}
                   onChange={(e) => setFormData({ ...formData, investmentId: e.target.value })}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/10 bg-gray-50"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/10 bg-white shadow-sm hover:border-gray-300 transition-colors"
                   required={formData.balanceSource === 'INVESTMENT'}
                 >
-                  <option value="">Select investment</option>
+                  <option value="" disabled>Select an investment...</option>
                   {investments.map((inv) => (
                     <option key={inv.id} value={inv.id}>
-                      {inv.investmentId} — ${Number(inv.currentBalance).toLocaleString()}
+                      {inv.investmentId} — Balance: ${Number(inv.currentBalance).toLocaleString()}
                     </option>
                   ))}
+                  {investments.length === 0 && (
+                    <option value="" disabled>No investments available</option>
+                  )}
                 </select>
               </div>
             )}
