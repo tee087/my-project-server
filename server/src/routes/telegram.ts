@@ -83,8 +83,10 @@ router.post('/webhook', async (req, res) => {
     const validSecret = process.env.BOT_SECRET || process.env.TELEGRAM_WEBHOOK_SECRET || ''
     
     if (validSecret) {
-      if (receivedSecret !== validSecret) {
-        console.warn(`Rejected Telegram webhook - secret token mismatch. Expected: ${validSecret}, Received: ${receivedSecret || 'undefined'}`)
+      if (!receivedSecret) {
+        console.warn('Received webhook without secret token - this may indicate webhook was registered without a secret')
+      } else if (receivedSecret !== validSecret) {
+        console.warn(`Rejected Telegram webhook - secret token mismatch. Expected: ${validSecret}, Received: ${receivedSecret}`)
         res.sendStatus(200)
         return
       }
